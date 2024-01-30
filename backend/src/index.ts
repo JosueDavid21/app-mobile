@@ -10,7 +10,6 @@ const app = express();
 app.use(express.json());
 const PORT = 3000;
 
-// app.use(cors());
 app.use(cors({
   origin: ["exp://192.168.100.46:8081"],
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -51,13 +50,8 @@ const generatePrompt = (numberToConvert: number) => {
 let names = [
   {
     id: uuidv4(),
-    firstName: "Pablo",
-    lastName: "Caiza",
-  },
-  {
-    id: uuidv4(),
-    firstName: "Lea",
-    lastName: "Rolfes",
+    firstName: "Josue",
+    lastName: "David",
   },
 ];
 app.get("/ping", (req, res) => {
