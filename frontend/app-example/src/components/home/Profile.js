@@ -47,7 +47,7 @@ const Profile = () => {
         <Text style={styles.follow}>Follow us on our social networks</Text>
         <View style={styles.networkContainer}>
           <TouchableWithoutFeedback
-            onPress={() => Linking.openURL("https://tiktok.com/")}
+            onPress={() => Linking.openURL("https://facebook.com/")}
           >
             {facebook}
           </TouchableWithoutFeedback>
@@ -64,7 +64,7 @@ const Profile = () => {
             {tiktok}
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback
-            onPress={() => Linking.openURL("https://linkedin.com/")}
+            onPress={() => Linking.openURL("https://youtube.com/")}
           >
             {youtube}
           </TouchableWithoutFeedback>
