@@ -26,7 +26,7 @@ The front was developed in React Native and uses Expo.
 
 ### Important!
 Before build the frontend is necesary change the IP (with port 3000) from API request in file "./src/screen/User.js"
-This file contain the variable serverIP (use your IP addres)
+This file contain the variable serverIP (use your IP address)
 ```javascript
 // Here change server ip 
 const serverIP = "255.255.255.255:3000";
