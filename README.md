@@ -13,7 +13,7 @@ npm install
 ### Start API Service
 ```bash
 tsc
-node buil/index.jx
+node build/index.js
 ```
 ### Note!
 For use the comand tsc is necesary install typescript
