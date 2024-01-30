@@ -10,7 +10,7 @@ import {
   Modal,
 } from "react-native";
 
-// Change server ip 
+// Here change server ip 
 const serverIP = "10.119.222.144:3000";
 
 const User = () => {
