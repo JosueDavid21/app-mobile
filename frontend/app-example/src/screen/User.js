@@ -10,6 +10,9 @@ import {
   Modal,
 } from "react-native";
 
+// Change server ip 
+const serverIP = "10.119.222.144:3000";
+
 const User = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -48,7 +51,7 @@ const User = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:3000/nombres");
+      const response = await fetch(`http://${serverIP}/nombres`);
       const jsonData = await response.json();
       console.log(jsonData);
       setUsers(jsonData);
@@ -59,7 +62,7 @@ const User = () => {
 
   const deleteUser = async (item) => {
     try {
-      const response = await fetch(`http://localhost:3000/nombres/${item.id}`, {
+      const response = await fetch(`http://${serverIP}/nombres/${item.id}`, {
         method: "DELETE",
       });
       if (response.status === 204) {
@@ -73,7 +76,7 @@ const User = () => {
   const editUser = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/nombres/${selectedUser.id}`,
+        `http://${serverIP}/nombres/${selectedUser.id}`,
         {
           method: "PUT",
           headers: {
@@ -101,7 +104,7 @@ const User = () => {
   };
   const createUser = async () => {
     try {
-      const response = await fetch("http://localhost:3000/nombres", {
+      const response = await fetch(`http://${serverIP}/nombres`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -133,8 +136,9 @@ const User = () => {
         placeholder="Last Name"
         style={styles.input}
       />
+
       <Button title="Create" color="#841584" onPress={createUser} />
-      <View>
+      <View style={styles.containerList}>
         {users.length > 0 && (
           <View style={styles.itemContainer}>
             <View>
@@ -198,6 +202,12 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     display: "flex",
+  },
+  containerList: {
+    marginTop: 40,
+    padding: 10,
+    width:"100%",
+    justifyContent: "center",
   },
   itemContainer: {
     flexDirection: "row",
