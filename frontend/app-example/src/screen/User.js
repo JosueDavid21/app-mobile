@@ -11,7 +11,8 @@ import {
 } from "react-native";
 
 // Here change server ip 
-const serverIP = "192.168.100.46:3000";
+// const serverIP = "192.168.100.46:3000";
+const serverIP = "10.3.20.193:3000";
 
 const User = () => {
   const [firstName, setFirstName] = useState("");

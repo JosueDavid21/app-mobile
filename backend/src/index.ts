@@ -11,7 +11,8 @@ app.use(express.json());
 const PORT = 3000;
 
 app.use(cors({
-  origin: ["exp://192.168.100.46:8081"],
+  origin: ["exp://192.168.100.46:3000"],
+  // origin: ["exp://10.3.20.193:3000"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
