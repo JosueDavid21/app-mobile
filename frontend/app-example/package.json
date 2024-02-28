@@ -11,11 +11,13 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
     "@expo/webpack-config": "^19.0.1",
+    "@mdi/js": "^7.4.47",
     "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
     "expo": "~50.0.3",
     "expo-document-picker": "~11.10.1",
+    "expo-file-system": "~16.0.6",
     "expo-status-bar": "~1.11.1",
     "openai": "^3.3.0",
     "react": "18.2.0",

@@ -1,0 +1,38 @@
+// const handleUpload = async () => {
+  const uploadFile = async () => {
+    try {
+      if (!file) {
+        Alert.alert("Por favor, selecciona un archivo.");
+        return;
+      }
+      const fileUri = file.uri;
+      // const fileInfo = await FileSystem.getInfoAsync(fileUri);
+      const fileBase64 = await FileSystem.readAsStringAsync(fileUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // const data = new FormData();
+      // data.append("question", question);
+      // data.append("file", file);
+      // console.log(data);
+      // console.log(file.assets[0]);
+      const response = await fetch(`http://${serverIP}/upload`, {
+        method: "POST",
+        headers: {
+          "Content-Type": file.mimeType,
+        },
+        // body: JSON.stringify(data),
+        // body: data,
+        body: fileBase64,
+      });
+      if (response.ok) {
+        setQuestion("");
+        const responseJSON = await response.json();
+        setResult(responseJSON.response);
+      } else {
+        setResult("Algo salio mal!!! :(");
+      }
+    } catch (error) {
+      console.error("Error al enviar el archivo: ", error);
+    }
+  };

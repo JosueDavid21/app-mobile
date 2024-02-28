@@ -1,55 +1,82 @@
-import React, {useState} from "react";
-import {Text, View, StyleSheet, Button, TextInput} from "react-native";
+import React, { useState } from "react";
+import { Text, View, StyleSheet, Button, TextInput, Alert } from "react-native";
 import * as ExpoDocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
+
+const serverIP = process.env.EXPO_PUBLIC_ServerIP;
 
 const Pdf = () => {
-    const [pdfDoc, setPdfDoc] = useState()
-    const [question, setQuestion] = useState('')
-    const [result, setResult] = useState('')
-    const handleFilePicker = async () => {
-        let result = await ExpoDocumentPicker.getDocumentAsync({copyToCacheDirectory: true});
-        setPdfDoc(result.file)
+  const [file, setFile] = useState({ canceled: true });
+  const [question, setQuestion] = useState("");
+  const [result, setResult] = useState("");
+
+  const handleFilePicker = async () => {
+    const result = await ExpoDocumentPicker.getDocumentAsync();
+    setFile(result);
+  };
+
+  const handleUpload = async () => {
+    try {
+      if (!file.canceled && question === "") {
+      } else {
+        const response = await FileSystem.uploadAsync(
+          `http://${serverIP}/upload`,
+          file.assets[0].uri,
+          {
+            fieldName: file.assets[0].name,
+            httpMethod: "POST",
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Question: question,
+              Name: file.assets[0].name,
+            },
+            uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
+          }
+        );
+        await response;
+        setResult(response.body);
+        setQuestion("");
+      }
+    } catch (error) {
+      console.log(error);
     }
-    const handleUpload = async () => {
-        try {
-            const data = new FormData()
-            data.append('question', question)
-            data.append('file', pdfDoc)
-            console.log(data.get('file'))
-            const response = await fetch('http://localhost:9004/upload', {
-                method: 'POST',
-                body: data
-            })
-            if (response.ok) {
-                setQuestion('')
-                const responseJSON = await response.json()
-                setResult(responseJSON.text)
-            }
+  };
 
+  return (
+    <View>
+      <Button title={"Select PDF"} onPress={handleFilePicker} />
+      {!file.canceled && (
+        <Text style={styles.text}>{file.assets[0].name} seleccionado.</Text>
+      )}
 
-        } catch (error) {
-            console.log(error)
-        }
-
-    }
-
-    return (
-        <View>
-            <Button title={'Select PDF'} onPress={handleFilePicker}/>
-            <TextInput style={styles.input} value={question} onChangeText={setQuestion}
-                       placeholder={'Ingresa tu pregunta'}/>
-            <Button title={'send'} onPress={handleUpload}/>
-            <Text>{result}</Text>
-        </View>
-    )
-}
+      <TextInput
+        style={styles.input}
+        value={question}
+        onChangeText={setQuestion}
+        placeholder={"Ingresa tu pregunta"}
+      />
+      <Button title={"send"} onPress={handleUpload} />
+      <View style={styles.response}>
+        <Text style={styles.text}>{result}</Text>
+      </View>
+    </View>
+  );
+};
 const styles = StyleSheet.create({
-    input: {
-        backgroundColor: 'white',
-        borderWidth: 1,
-        borderRadius: 10,
-        padding: 10,
-        margin: 10
-    }
-})
-export default Pdf
+  input: {
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    margin: 10,
+  },
+  text: {
+    fontSize: 14,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  response: {
+    padding: 50,
+  },
+});
+export default Pdf;

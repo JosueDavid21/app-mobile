@@ -8,16 +8,19 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon2 from "react-native-vector-icons/AntDesign";
 const iconSize = 35;
 const facebook = <Icon name={"facebook"} size={iconSize} color={"#106bff"} />;
 const instagram = <Icon name={"instagram"} size={iconSize} color={"#d50868"} />;
 const tiktok = <Icon name={"tiktok"} size={iconSize} color={"black"} />;
 const youtube = <Icon name={"youtube"} size={iconSize} color={"#fe080a"} />;
+const kwai = <Icon2 name={"videocamera"} size={iconSize} color={"#ff4906"} />;
 
 const Profile = () => {
   const user = {
     avatar:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjMQzgGL0G1DOkQsVGbPa7QuG5WJ4C1BGyIA&usqp=CAU",
+      // "https://i.postimg.cc/nrPWCTfW/Foto-Profesional.jpg",
     name: "Josue David",
   };
   return (
@@ -50,6 +53,13 @@ const Profile = () => {
             onPress={() => Linking.openURL("https://facebook.com/")}
           >
             {facebook}
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              Linking.openURL("https://www.kwai.com/es");
+            }}
+          >
+            {kwai}
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback
             onPress={() => {
@@ -102,6 +112,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "white",
     zIndex: 1,
+  },
+  kwai: {
+    width: 30,
+    height: 30,
   },
   avatar: {
     width: 150,

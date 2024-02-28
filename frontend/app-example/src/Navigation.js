@@ -24,6 +24,16 @@ const Navigation = () => {
         }}
       />
       <Tab.Screen
+        name="New"
+        component={Profile}
+        options={{
+          tabBarLabel: "New",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="alarm" color={color} size={35} />
+          ),
+        }}
+      />
+      <Tab.Screen
         name={"Products"}
         component={ListComponent}
         options={{
