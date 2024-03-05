@@ -21,6 +21,8 @@ const openai_1 = require("@langchain/openai");
 const prompts_1 = require("@langchain/core/prompts");
 const output_parsers_1 = require("@langchain/core/output_parsers");
 const langchain_PDF_1 = __importDefault(require("./langchain_PDF"));
+const converter_1 = __importDefault(require("./converter"));
+const joinPdf_1 = __importDefault(require("./joinPdf"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -79,34 +81,48 @@ app.post("/openapi", (req, res) => __awaiter(void 0, void 0, void 0, function* (
     res.send({ result: response });
 }));
 //    ************      API Rest OpenAI PDF      ************
-const multer = require("multer");
 const fs = require("fs");
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "uploads/");
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname);
-    },
-});
-const upload = multer({ storage: storage });
 app.post("/upload", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const langchain = new langchain_PDF_1.default();
+    const converter = new converter_1.default();
     const copyFilePromise = new Promise((resolve, reject) => {
-        req.pipe(fs.createWriteStream(`./uploads/${req.headers.name}`))
-            .on('finish', resolve)
-            .on('error', reject);
+        req
+            .pipe(fs.createWriteStream(`./uploads/${req.headers.name}`))
+            .on("finish", resolve)
+            .on("error", reject);
     });
     try {
         yield copyFilePromise;
-        const name = req.headers.name;
-        const question = req.headers.question;
+        res.send(copyFilePromise);
+    }
+    catch (error) {
+        res.status(500).send("Error al copiar el archivo");
+    }
+}));
+app.get("/question", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const langchain = new langchain_PDF_1.default();
+    try {
+        const question = req.query.question;
+        const pdfs = JSON.parse(req.query.pdfs);
+        let name = "";
+        if (pdfs.length > 1) {
+            const pdfString = [];
+            for (let i = 0; i < pdfs.length; i++) {
+                pdfString.push(`./uploads/${pdfs[i].title}`);
+            }
+            new joinPdf_1.default()
+                .unirPDFs(pdfString, "./uploads/joinPdf.pdf")
+                .catch((error) => console.error("Error:", error));
+            name = "joinPdf.pdf";
+        }
+        else {
+            name = pdfs[0].title;
+        }
         yield langchain.processPDFToVectorStore(name);
         const response = yield langchain.useFaissVectorStrore(question);
         res.send(response.text);
     }
     catch (error) {
-        res.status(500).send("Error al copiar el archivo");
+        res.status(500).send("Error generando respuesta");
     }
 }));
 app.listen(PORT, () => {

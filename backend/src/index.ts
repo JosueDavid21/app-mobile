@@ -7,6 +7,8 @@ import { ChatOpenAI } from "@langchain/openai";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import Langchain_PDF from "./langchain_PDF";
+import Converter from "./converter";
+import JoinPdf from "./joinPdf";
 
 dotenv.config();
 const app = express();
@@ -71,36 +73,47 @@ app.post("/openapi", async (req, res) => {
 });
 
 //    ************      API Rest OpenAI PDF      ************
-const multer = require("multer");
 const fs = require("fs");
-const storage = multer.diskStorage({
-  destination: function (req: any, file: any, cb: any) {
-    cb(null, "uploads/");
-  },
-  filename: function (req: any, file: any, cb: any) {
-    cb(null, file.originalname);
-  },
-});
-const upload = multer({ storage: storage });
 app.post("/upload", async (req, res) => {
-  const langchain = new Langchain_PDF();
+  const converter = new Converter();
   const copyFilePromise = new Promise((resolve, reject) => {
-    req.pipe(fs.createWriteStream(`./uploads/${req.headers.name}`))
-       .on('finish', resolve)
-       .on('error', reject);
+    req
+      .pipe(fs.createWriteStream(`./uploads/${req.headers.name}`))
+      .on("finish", resolve)
+      .on("error", reject);
   });
   try {
     await copyFilePromise;
-    const name: string = req.headers.name as string;
-    const question: string = req.headers.question as string;
-    await langchain.processPDFToVectorStore(name);
-    const response = await langchain.useFaissVectorStrore(question);
-    res.send(response.text);
+    res.send(copyFilePromise);
   } catch (error) {
     res.status(500).send("Error al copiar el archivo");
   }
 });
-
+app.get("/question", async (req, res) => {
+  const langchain = new Langchain_PDF();
+  try {
+    const question: string = req.query.question as string;
+    const pdfs = JSON.parse(req.query.pdfs);
+    let name: string = "";
+    if (pdfs.length > 1) {
+      const pdfString: string[] = [];
+      for (let i = 0; i < pdfs.length; i++) {
+        pdfString.push(`./uploads/${pdfs[i].title}`);
+      }
+      new JoinPdf()
+        .unirPDFs(pdfString, "./uploads/joinPdf.pdf")
+        .catch((error) => console.error("Error:", error));
+      name = "joinPdf.pdf";
+    } else {
+      name = pdfs[0].title as string;
+    }
+    await langchain.processPDFToVectorStore(name);
+    const response = await langchain.useFaissVectorStrore(question);
+    res.send(response.text);
+  } catch (error) {
+    res.status(500).send("Error generando respuesta");
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`running application ${PORT}`);
