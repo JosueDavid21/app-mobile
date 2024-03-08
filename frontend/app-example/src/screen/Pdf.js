@@ -11,7 +11,6 @@ const Pdf = () => {
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState("");
   const [chips, setChips] = useState([]);
-  const [pdf, setPdf] = useState([]);
   const [charge, setCharge] = useState(true);
 
   const handleFilePicker = async () => {
