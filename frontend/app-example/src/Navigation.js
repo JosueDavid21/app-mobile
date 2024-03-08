@@ -5,12 +5,12 @@ import Profile from "./components/home/Profile";
 import ListComponent from "./components/list/List";
 import User from "./screen/User";
 import Chat from "./screen/Chat";
+import Classifier from "./screen/Classifier";
 import Pdf from "./screen/Pdf";
 
 const Tab = createBottomTabNavigator();
 
 const Navigation = () => {
-  const [color, setColor] = useState("red");
   return (
     <Tab.Navigator initialRouteName="Home">
       <Tab.Screen
@@ -20,16 +20,6 @@ const Navigation = () => {
           tabBarLabel: "Home",
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="home" color={color} size={35} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="New"
-        component={Profile}
-        options={{
-          tabBarLabel: "New",
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="alarm" color={color} size={35} />
           ),
         }}
       />
@@ -78,6 +68,16 @@ const Navigation = () => {
               color={color}
               size={35}
             />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Classifier"
+        component={Classifier}
+        options={{
+          tabBarLabel: "Classifier",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="family-tree" color={color} size={35} />
           ),
         }}
       />

@@ -21,7 +21,6 @@ const openai_1 = require("@langchain/openai");
 const prompts_1 = require("@langchain/core/prompts");
 const output_parsers_1 = require("@langchain/core/output_parsers");
 const langchain_PDF_1 = __importDefault(require("./langchain_PDF"));
-const converter_1 = __importDefault(require("./converter"));
 const joinPdf_1 = __importDefault(require("./joinPdf"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -83,7 +82,6 @@ app.post("/openapi", (req, res) => __awaiter(void 0, void 0, void 0, function* (
 //    ************      API Rest OpenAI PDF      ************
 const fs = require("fs");
 app.post("/upload", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const converter = new converter_1.default();
     const copyFilePromise = new Promise((resolve, reject) => {
         req
             .pipe(fs.createWriteStream(`./uploads/${req.headers.name}`))
@@ -123,6 +121,20 @@ app.get("/question", (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
     catch (error) {
         res.status(500).send("Error generando respuesta");
+    }
+}));
+//    ************      API Rest PDF to Text      ************
+const pdfPasrse = require("pdf-parse");
+app.get("/getText", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const pdf = `./uploads/${req.query.name}`;
+        let dataBuffer = fs.readFileSync(pdf);
+        pdfPasrse(dataBuffer).then(function (data) {
+            res.send(data.text);
+        });
+    }
+    catch (error) {
+        res.status(500).send("Error al obtener texto del PDF");
     }
 }));
 app.listen(PORT, () => {

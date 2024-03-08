@@ -54,7 +54,7 @@ const Pdf = () => {
               httpMethod: "POST",
               headers: {
                 "Content-Type": "multipart/form-data",
-                Name: file.assets[i].name,
+                name: file.assets[i].name,
               },
               uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
             }

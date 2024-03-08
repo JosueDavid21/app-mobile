@@ -7,8 +7,8 @@ import { ChatOpenAI } from "@langchain/openai";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import Langchain_PDF from "./langchain_PDF";
-import Converter from "./converter";
 import JoinPdf from "./joinPdf";
+import TransformersNLP from "./transformersNLP.js";
 
 dotenv.config();
 const app = express();
@@ -75,7 +75,6 @@ app.post("/openapi", async (req, res) => {
 //    ************      API Rest OpenAI PDF      ************
 const fs = require("fs");
 app.post("/upload", async (req, res) => {
-  const converter = new Converter();
   const copyFilePromise = new Promise((resolve, reject) => {
     req
       .pipe(fs.createWriteStream(`./uploads/${req.headers.name}`))
@@ -112,6 +111,20 @@ app.get("/question", async (req, res) => {
     res.send(response.text);
   } catch (error) {
     res.status(500).send("Error generando respuesta");
+  }
+});
+
+//    ************      API Rest PDF to Text      ************
+const pdfPasrse = require("pdf-parse");
+app.get("/getText", async (req, res) => {
+  try {
+    const pdf = `./uploads/${req.query.name}`;
+    let dataBuffer = fs.readFileSync(pdf);
+    pdfPasrse(dataBuffer).then(function (data: any) {
+      res.send(data.text);
+    });
+  } catch (error) {
+    res.status(500).send("Error al obtener texto del PDF");
   }
 });
 
