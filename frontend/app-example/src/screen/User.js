@@ -4,11 +4,12 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  TouchableHighlight,
+  Modal,
   Button,
   FlatList,
-  Modal,
 } from "react-native";
+
+import Notice from "../components/Notice";
 
 const serverIP = process.env.EXPO_PUBLIC_ServerIP;
 
@@ -18,6 +19,11 @@ const User = () => {
   const [users, setUsers] = useState([]);
   const [showEdit, setShowEdit] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
+  const [notice, setNotice] = useState(false);
+
+  const toggleModalVisibility = () => {
+    setNotice(false);
+  };
 
   useEffect(() => {
     fetchData();
@@ -101,27 +107,37 @@ const User = () => {
     }
   };
   const createUser = async () => {
-    try {
-      const response = await fetch(`http://${serverIP}/nombres`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ firstName, lastName }),
-      });
-      if (response.ok) {
-        setFirstName("");
-        setLastName("");
-        const responseJSON = await response.json();
-        setUsers([...users, responseJSON]);
+    if (firstName === "" || lastName === "") {
+      setNotice(true);
+    } else {
+      setNotice(false);
+      try {
+        const response = await fetch(`http://${serverIP}/nombres`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ firstName, lastName }),
+        });
+        if (response.ok) {
+          setFirstName("");
+          setLastName("");
+          const responseJSON = await response.json();
+          setUsers([...users, responseJSON]);
+        }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
     }
   };
 
   return (
     <View style={styles.container}>
+      <Notice
+        render={notice}
+        message={"No se puede contener espacios vacios!"}
+        closeModal={toggleModalVisibility}
+      />
       <TextInput
         value={firstName}
         onChangeText={setFirstName}
@@ -134,8 +150,11 @@ const User = () => {
         placeholder="Last Name"
         style={styles.input}
       />
-
-      <Button title="Create" color="#841584" onPress={createUser} />
+      <View style={styles.container_btn}>
+        <View style={styles.btn}>
+          <Button title="Create" onPress={createUser} />
+        </View>
+      </View>
       <View style={styles.containerList}>
         {users.length > 0 && (
           <View style={styles.itemContainer}>
@@ -159,7 +178,7 @@ const User = () => {
           renderItem={({ item }) => <Item item={item} />}
         />
         <Modal transparent={true} animationType={"slide"} visible={showEdit}>
-          <View style={styles.centerView}>
+          <View style={styles.centeredView}>
             <View
               style={{
                 height: 300,
@@ -185,9 +204,17 @@ const User = () => {
                 placeholder="Last Name"
                 style={styles.input}
               />
-              <Button title={"Edit"} onPress={editUser} />
-
-              <Button title={"Cancelar"} onPress={() => setShowEdit(false)} />
+              <View style={styles.container_btn}>
+                <View style={styles.btn}>
+                  <Button title={"Edit"} onPress={editUser} />
+                </View>
+                <View style={styles.btn}>
+                  <Button
+                    title={"Cancelar"}
+                    onPress={() => setShowEdit(false)}
+                  />
+                </View>
+              </View>
             </View>
           </View>
         </Modal>
@@ -204,7 +231,7 @@ const styles = StyleSheet.create({
   containerList: {
     marginTop: 40,
     padding: 10,
-    width:"100%",
+    width: "100%",
     justifyContent: "center",
   },
   itemContainer: {
@@ -227,11 +254,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  centerView: {
+  container_btn: {
     alignItems: "center",
     justifyContent: "center",
-    margin: 30,
-    flex: 1,
+    margin: 25,
+  },
+  btn: {
+    justifyContent: "center",
+    width: "40%",
+    marginBottom: 20,
   },
 });
 export default User;

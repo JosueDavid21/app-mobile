@@ -4,14 +4,21 @@ import { Chip } from "react-native-paper";
 import * as ExpoDocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 
+import Notice from "../components/Notice";
+
 const serverIP = process.env.EXPO_PUBLIC_ServerIP;
 
 const Pdf = () => {
-  const [file, setFile] = useState({ canceled: true });
+  const [file, setFile] = useState({ assets: null, canceled: true });
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState("");
   const [chips, setChips] = useState([]);
   const [charge, setCharge] = useState(true);
+  const [notice, setNotice] = useState(false);
+
+  const toggleModalVisibility = () => {
+    setNotice(false);
+  };
 
   const handleFilePicker = async () => {
     const document = await ExpoDocumentPicker.getDocumentAsync({
@@ -36,13 +43,15 @@ const Pdf = () => {
   };
 
   const restartDocument = () => {
-    setFile({ canceled: true });
+    setFile({ assets: null, canceled: true });
     setChips([]);
   };
 
   const handleUpload = async () => {
-    if (!file.canceled && question === "") {
+    if (file.assets === null || question === "") {
+      setNotice(true);
     } else {
+      setNotice(false);
       const newPdf = [];
       for (let i = 0; i < file.assets.length; i++) {
         try {
@@ -97,6 +106,11 @@ const Pdf = () => {
 
   return (
     <View style={styles.container}>
+      <Notice
+        render={notice}
+        message={"Asegurate de seleccionar un pdf e ingresar tu pregunta"}
+        closeModal={toggleModalVisibility}
+      />
       <View style={styles.containerButton}>
         <Button title={"Select PDF"} onPress={handleFilePicker} />
       </View>

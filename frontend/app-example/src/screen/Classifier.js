@@ -4,13 +4,20 @@ import { Chip } from "react-native-paper";
 import * as ExpoDocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 
+import Notice from "../components/Notice";
+
 const serverIP = process.env.EXPO_PUBLIC_ServerIP;
 
 const Classifier = () => {
-  const [file, setFile] = useState({ canceled: true });
+  const [file, setFile] = useState({ assets: null, canceled: true });
   const [result, setResult] = useState("");
   const [chips, setChips] = useState([]);
   const [charge, setCharge] = useState(true);
+  const [notice, setNotice] = useState(false);
+
+  const toggleModalVisibility = () => {
+    setNotice(false);
+  };
 
   useEffect(() => {
     const opc = [
@@ -47,9 +54,16 @@ const Classifier = () => {
   };
 
   const handleUpload = async () => {
-    if (file.canceled) {
-      console.error("Seleccione un pdf");
+    const labels = [];
+    chips.map((chip) => {
+      if (chip.selected) {
+        labels.push(chip.text);
+      }
+    });
+    if (file.assets === null || labels.length < 1) {
+      setNotice(true);
     } else {
+      setNotice(false);
       try {
         await FileSystem.uploadAsync(
           `http://${serverIP}/upload`,
@@ -83,12 +97,6 @@ const Classifier = () => {
             throw new Error("Error de red o servidor");
           }
           const text = await response.text();
-          const labels = [];
-          chips.map((chip) => {
-            if (chip.selected) {
-              labels.push(chip.text);
-            }
-          });
           const data = {
             text: text,
             labels: labels,
@@ -110,7 +118,7 @@ const Classifier = () => {
             show += `${result.labels[i]}   -   ${score.toFixed(3)}\n`;
           }
           setResult(show);
-          setFile({ canceled: true });
+          setFile({ assets: null, canceled: true });
         } catch (error) {
           console.error("Error:", error);
         }
@@ -120,6 +128,11 @@ const Classifier = () => {
 
   return (
     <View style={styles.container}>
+      <Notice
+        render={notice}
+        message={"Selecciona un pdf y por lo menos 1 item"}
+        closeModal={toggleModalVisibility}
+      />
       <View style={styles.containerButton}>
         <Button title={"Select PDF"} onPress={handleFilePicker} />
       </View>
